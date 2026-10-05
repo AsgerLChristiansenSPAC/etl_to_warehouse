@@ -1,0 +1,46 @@
+# Dev Log
+
+# 05/10/2026
+
+This project formally began on 28/09/2026. Some confusion occured about the scope of the project, and whether or not it was a group project or not.
+
+Today, that confusion has been cleared up. As such, I'm creating a new repository, and will relatively rapidly be pushing the code I created last week.
+
+## Initial Commit: AKA, what I developed in the first week.
+
+My first area of focus was learning how to run SQL files or run postgresQL terminal commands using bash scripts. The idea is to ensure that the database *structure* can be uniformly set up using code. AKA, since you can't really publish the postgres database itself to GitHub, you can at least publish code that creates an identical database.
+
+I will probably switch to using docker for this purpose, but if that doesn't work, I will fall back on this approach.
+
+Assuming postgres is installed locally, my database structure is achieved using the following bash scripts:
+
+- role_setup.sh
+
+- db_setup.sh
+
+These can be run in a git bash terminal by simply writing:
+
+bash [scriptname].sh
+
+The first script requires a superuser to login, and create a new role whose only privileges is CREATEDB.
+
+This script should be run first, since the intent is to have the rest of the codebase not relying on the superuser. All other scripts, including *db_setup.sh*, refers to the role created by running *role_setup.sh*.
+
+As for *db_setup.sh*: Using the new role, it creates a database and a table based on the design specified in src/setup/table_setup.sql. THe idea is that this sql-file can be tailored to whatever the project needs, without needing to modify the bash scripts themselves.
+
+Aside from that sql file, the bash scripts require a file called "src/config.py", in which sensitive variables that should not be pushed to github is specified. This includes the new role's username and password, as well as other relevant connectivity information like ports, etc. A user must write this config file themselves, and it is naturally included in .gitignore.
+
+
+### Config file template:
+
+host_name="host name"
+database_name="default database name here"
+new_database_name="new database name here"
+superuser_name="super user name here"
+role_name="user name here"
+port_name="port number"
+role_password="'your password here'"
+
+## README Issues
+
+Because of the slightly chaotic project structure in the first week, I need to reevaluate some things, and commit my existing work, before properly formulating a README.
