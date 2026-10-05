@@ -6,11 +6,12 @@ This project formally began on 28/09/2026. Some confusion occured about the scop
 
 Today, that confusion has been cleared up. As such, I'm creating a new repository, and will relatively rapidly be pushing the code I created last week.
 
-## Initial Commit: AKA, what I developed in the first week.
+## Initial Commit to branch postgres_setup
+AKA, what I developed in the first week.
 
 My first area of focus was learning how to run SQL files or run postgresQL terminal commands using bash scripts. The idea is to ensure that the database *structure* can be uniformly set up using code. AKA, since you can't really publish the postgres database itself to GitHub, you can at least publish code that creates an identical database.
 
-I will probably switch to using docker for this purpose, but if that doesn't work, I will fall back on this approach.
+I will probably switch to using docker for this purpose, but if that doesn't work, I will fall back on this approach. For the moment, it is pushed to branch postgres_setup.
 
 Assuming postgres is installed locally, my database structure is achieved using the following bash scripts:
 
