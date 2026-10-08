@@ -10,5 +10,6 @@ docker run \
 # The variable {-d} ensures that program runs in detached mode, meaning it isn't necessary to open a new terminal window.
 
 # The --rm flag ensures that it gets removed on stop.
-#    --env POSTGRES_USER="$superuser_name" \ # This will make docker setup a default database *named* postgres user... in addition to postgres.
-# Impossible to turn off it seems, kinda useless.
+
+# Note: Specifying POSTGRES_USER automatically creates a default database with that name, in addition to the default postgres.
+# Hence, POSTGRES_USER isnt specified, defaulting to "postgres"

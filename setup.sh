@@ -3,20 +3,20 @@ export DOCKER_CLI_HINTS=false
 
 
 echo "Setup container"
-bash docker_setup.sh
+bash src/container/docker_setup.sh
 
 sleep 3
 
 echo "Setup role: developer"
-bash role_setup.sh
+bash src/container/role_setup.sh
 sleep 1
 
-echo "setup database"
-bash db_setup.sh
+echo "Setup database"
+bash src/container/db_setup.sh
 sleep 1
 
-echo "setup tables"
-bash table_setup.sh
+echo "Setup tables"
+bash src/container/table_setup.sh
 sleep 1
 
 echo "Done!"
