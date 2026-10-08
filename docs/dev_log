@@ -6,11 +6,12 @@ This project formally began on 28/09/2026. Some confusion occured about the scop
 
 Today, that confusion has been cleared up. As such, I'm creating a new repository, and will relatively rapidly be pushing the code I created last week.
 
-## Initial Commit: AKA, what I developed in the first week.
+## Initial Commit to branch postgres_setup
+AKA, what I developed in the first week.
 
 My first area of focus was learning how to run SQL files or run postgresQL terminal commands using bash scripts. The idea is to ensure that the database *structure* can be uniformly set up using code. AKA, since you can't really publish the postgres database itself to GitHub, you can at least publish code that creates an identical database.
 
-I will probably switch to using docker for this purpose, but if that doesn't work, I will fall back on this approach.
+I will probably switch to using docker for this purpose, but if that doesn't work, I will fall back on this approach. For the moment, it is pushed to branch postgres_setup.
 
 Assuming postgres is installed locally, my database structure is achieved using the following bash scripts:
 
@@ -30,6 +31,14 @@ As for *db_setup.sh*: Using the new role, it creates a database and a table base
 
 Aside from that sql file, the bash scripts require a file called "src/config.py", in which sensitive variables that should not be pushed to github is specified. This includes the new role's username and password, as well as other relevant connectivity information like ports, etc. A user must write this config file themselves, and it is naturally included in .gitignore.
 
+### Thoughts on this approach:
+
+I have developed a script, db_reset.sh, which also requires superuser access, which undoes everything done by the other scripts. Mainly used for testing if the code works, so not uploaded to github just yet.
+
+It does work. Running bash db_reset.sh deletes the role and database specified in src/config.py, allowing the scripts to be rerun.
+
+I still think docker might be a more useful approach. Looking at that now.
+
 
 ### Config file template:
 
@@ -44,3 +53,28 @@ role_password="'your password here'"
 ## README Issues
 
 Because of the slightly chaotic project structure in the first week, I need to reevaluate some things, and commit my existing work, before properly formulating a README.
+
+
+# 07-10-2026
+
+Today I've finished a large number of bash scripts that setup (or tear down) a docker container, and subsequently:
+
+- uses the superuser to create a new role.
+- uses the new role to define a database.
+- defines three tables, specified with .sql files in /src/setup.
+
+The design of these three tables is still WIP, but it is based on DMI's open data API.
+
+## Remaining issues:
+
+### Poor documentation
+
+README is still not updated. Database design poorly described.
+
+### Bash scripts shouldn't be run individually
+
+I need to incorporate my bash code into a larger function, instead of having to run each bash script in order.
+
+### Unclear if primary keys are correct
+
+DMI's stations have a stationId... and an Id. And only the Id is a true primary key, since a station taken offline and then turned online again seemingly registers as two different GeoJSON features, with the same stationId but different Id, covering two different time periods.
