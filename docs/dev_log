@@ -78,3 +78,24 @@ I need to incorporate my bash code into a larger function, instead of having to 
 ### Unclear if primary keys are correct
 
 DMI's stations have a stationId... and an Id. And only the Id is a true primary key, since a station taken offline and then turned online again seemingly registers as two different GeoJSON features, with the same stationId but different Id, covering two different time periods.
+
+
+## 09/10/2026
+
+Short entry because I'm short for time.
+
+It took some figuring out, but I've developed functions that can translate any number of **kwargs into a coherent query for the DMI API. So, for example, if you specify:
+
+func(url={url_endpoint}, limit=1, stationId= "06070")
+
+The latter two kwargs will be parsed as '?limit=1&stationId=06070'.
+
+This, I think, will be really useful if we need our code to be able to switch between different APIs that might have different ways to query them.
+
+Also, I've developed *src/extractor.py*, which itself depends on the *extract/* folder. In there, I have tried to separate generic querying / geojson format handling functions (located in *extract_geojson.py*) from DMI-specific functions (*dmi_api.py*).
+
+Haven't been entirely succesful yet - the only function in *extractor*, extract(), does currently assume that it is talking to the DMI API. But by far most of the dmi-specific functionality is imported, and it will be relatively trivial to be able to switch what the extractor imports.
+
+
+### Issue: Unittesting extraction.
+I've found it tremendously difficult to test (in any rigorous fashion) the extract stage of the ETL process. In no small part because it has taken a while to even figure out how I wanted it to function. The transform stage should be simpler to test I guess.

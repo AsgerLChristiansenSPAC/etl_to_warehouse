@@ -48,3 +48,42 @@ def compose_query(url, parameters:dict = {}):
 
 
 
+def most_recent_station(features):
+
+    id_valid_from = [(feature["id"],feature["properties"]["validFrom"])
+                 for feature in features]
+
+    sorted_by_date = sorted(id_valid_from, key=lambda tup: datetime_dmi(tup[1]), reverse=True)
+
+    most_recent_id = sorted_by_date[0][0]
+
+    for feature in features:
+        id = feature["id"]
+        if id == most_recent_id:
+            return feature
+    return None
+
+
+def loop_through_pages(extractor_func):
+    # Assumes inner-function returns a feature-collection.
+    def inner(*args, page_limit = 1, **kwargs):
+        page = 0
+        feature_collection = extractor_func(*args, **kwargs)
+        feature_collections = []
+        while page < page_limit:
+            feature_collections.append(feature_collection)
+            links = feature_collection["links"]
+            rels = [link["rel"] for link in links]
+            if "next" in rels:
+                url = links[1]["href"]
+                feature_collection = extractor_func(url = url)
+                page += 1
+            else:
+                print(f"Reached last page before reaching page limit {page_limit}")
+                break
+        # Sometimes, the final feature-collection has no numbers returned.
+        if feature_collections[-1]["numberReturned"] == 0:
+            feature_collections = feature_collections[:-1]
+        return feature_collections
+    
+    return inner
