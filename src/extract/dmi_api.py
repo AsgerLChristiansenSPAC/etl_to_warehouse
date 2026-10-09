@@ -87,3 +87,12 @@ def loop_through_pages(extractor_func):
         return feature_collections
     
     return inner
+
+
+def dmi_query(query_function):
+
+    def wrapper(url, **kwargs):
+        query = compose_query(url, parameters=kwargs)
+        response = query_function(query)
+        return response
+    return wrapper
