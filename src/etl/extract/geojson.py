@@ -28,9 +28,3 @@ def extract_features(feature_colletion:dict):
         print(e)
         print("No features found, maybe not feature-collection")
         return None
-
-
-
-def extract_property(feature:dict, property:str):
-    return feature["properties"][property]
-

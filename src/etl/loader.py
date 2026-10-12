@@ -35,4 +35,5 @@ def insert_rows(conn, cols, rows, table):
     #    return 1
     #print("execute_values() done")
     cursor.close()
-    
+
+
