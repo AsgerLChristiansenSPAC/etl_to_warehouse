@@ -11,8 +11,10 @@ extract_dmi_pages = dmi_api.loop_through_pages(extract_dmi)
 
 
 if __name__ == "__main__":
-    import config
+    import sys
     import json
-    obs = extract_dmi_pages(url = config.DEFAULT_URL_OBSERVATION, page_limit = 2, **config.DEFAULT_PARAMETERS)
+    
+    from testing import testconfig
+    obs = extract_dmi_pages(url = testconfig.DEFAULT_URL_OBSERVATION, page_limit = 2, **testconfig.DEFAULT_PARAMETERS)
     # Check how many feature collections
     print(len(obs))
