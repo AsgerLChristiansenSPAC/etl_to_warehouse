@@ -7,7 +7,7 @@ bash src/container/docker_setup.sh
 
 sleep 3
 
-echo "Setup role: developer"
+echo "Setup role:"
 bash src/container/role_setup.sh
 sleep 1
 
