@@ -1,6 +1,7 @@
 import psycopg
 import sys
 
+import config
 from etl import extractor, loader, transformer, etl_config
 from etl.extract import geojson as e_geo
 
@@ -22,13 +23,11 @@ stationParams = transformer.get_dmi_station_parameters(MOCK_FEATURE)
 
 # Here you want to change your database, username & password according to your own values
 param_dic = {
-    "host"      : "localhost",
-    "dbname"  : "test",
-    "user"      : "developer",
-    "password"  : "specialisterne"
+    "host"      : config.host_name,
+    "dbname"  : config.new_database_name,
+    "user"      : config.role_name,
+    "password"  : config.role_password.strip("'")
 }
-
-
 
 table_name = "stationParameters"
 
