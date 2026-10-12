@@ -96,6 +96,10 @@ Also, I've developed *src/extractor.py*, which itself depends on the *extract/* 
 
 Haven't been entirely succesful yet - the only function in *extractor*, extract(), does currently assume that it is talking to the DMI API. But by far most of the dmi-specific functionality is imported, and it will be relatively trivial to be able to switch what the extractor imports.
 
+Update: Success! All dmi-specific code should now be imported by *extractor.py*.
+
+Perhaps I should make a class and have it define its methods based on a library of functions?
+
 
 ### Issue: Unittesting extraction.
 I've found it tremendously difficult to test (in any rigorous fashion) the extract stage of the ETL process. In no small part because it has taken a while to even figure out how I wanted it to function. The transform stage should be simpler to test I guess.
