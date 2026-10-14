@@ -80,7 +80,7 @@ I need to incorporate my bash code into a larger function, instead of having to 
 DMI's stations have a stationId... and an Id. And only the Id is a true primary key, since a station taken offline and then turned online again seemingly registers as two different GeoJSON features, with the same stationId but different Id, covering two different time periods.
 
 
-## 09/10/2026
+# 09/10/2026
 
 Short entry because I'm short for time.
 
@@ -101,5 +101,44 @@ Update: Success! All dmi-specific code should now be imported by *extractor.py*.
 Perhaps I should make a class and have it define its methods based on a library of functions?
 
 
-### Issue: Unittesting extraction.
+## Issue: Unittesting extraction.
 I've found it tremendously difficult to test (in any rigorous fashion) the extract stage of the ETL process. In no small part because it has taken a while to even figure out how I wanted it to function. The transform stage should be simpler to test I guess.
+
+
+# 12/10/2026
+
+A lot happened today. In brief:
+
+- Total repo reorganization. I've managed to use package structure (i.e. blank __init__.py files) to ensure that files can find eachother. Still not quite sure I've got it right, but more tinkering should fix that.
+
+The src/ folder now has a *package* called *etl*. It contains modules for extracting, transforming and loading data, which is called by *src/etl_process.py*.
+
+Repo structure could do with some cleanup, probably.
+
+# 14/10/2026
+
+From now on, just to keep it simple, working mainly in the branch etl_process.
+
+I've added a todo.md-file to keep track of and organize my current tasks, instead of writing them here in the devlog. Included in .gitignore for the moment, as I still haven't quite gotten the format down.
+
+I've continued my work on refactoring the codebase, because it is in dire need of cleanup and risks becoming very spaghettified.
+
+Because there has been a lot of learning in this project, it is admittedly very chaotic, and cleanup takes a lot of work. Progress was made, however, on the following areas:
+
+- *etl.py* now has a proper function, etl(), and only executes on my mock test example if __name__ == "__main__".
+
+- etl() itself delegates more of its code to the individual modules. For example, the *load* subpackage now has a function (uncreatively named *load()*) which takes a list-of-lists (provided by *transform*), connects to the database, and inserts into.
+
+- load() function actually asks the user for password, instead of expecting password to be passed as argument.
+
+- There are no longer two modules called geojson. All code for manipulating geojson objects is moved to the *transform* subpackage of *etl*.
+
+- The *extract* subpackage module previously called *geojson* is renamed *query* and contains only one function, *get_query()*.
+
+- Numerous renames of modules, functions, etc.
+
+- Currently, the code can only *very specifically* extract a station feature from DMI, transform it to a nested list of stationParameter primary keys, and insert that into the stationParameters table. I have made a lot of progress on generalizing the *transform* subpackage, to allow for more generic manipulation of DMI data. Soon, I hope, will be able to specify an API endpoint *and* a destination table via the input() command, and the code will transform  accordingly.
+
+- Though currently the solution is suboptimal, my program doesn't crash if it tries to reinsert the same data twice. Instead, it simply skips the row (using postgres transaction logic) if the row already exists in the database, and reports to the user how many duplicates it encountered. However, going row-by-row is expensive. I have ideas for a nearly-as-good solution though, involving batch-loading the data, and attempting to UPDATE if INSERT INTO fails.
+
+In short, lots of refactoring and cleanup still to do. But progress is being made!

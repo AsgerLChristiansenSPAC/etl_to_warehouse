@@ -3,42 +3,39 @@ import sys
 
 import config
 from etl import extractor, loader, transformer, etl_config
-from etl.extract import geojson as e_geo
+from etl import transform
 
 
 # Defining extractor functions:
 
-# Defining extract_dmi() as dmi-specific version of geo.get_query()
-
-
-
-
-MOCK_FEATURE_COLLECTION =extractor.extract_dmi_collection(url = etl_config.DEFAULT_URL_STATION,  **etl_config.DEFAULT_STATION_PARAMETERS)
-
-
-MOCK_FEATURE =e_geo.extract_features(MOCK_FEATURE_COLLECTION
-     )[0]
-
-stationParams = transformer.get_dmi_station_parameters(MOCK_FEATURE)
 
 # Here you want to change your database, username & password according to your own values
-param_dic = {
+
+def etl(host, dbname, user, url, table, **kwargs):
+    # kwargs specify query parameters
+    # if DMI:
+
+    # EXTRACT:
+    featureCollection =extractor.extract_dmi_collection(url = url,  **kwargs)
+    
+    
+    # TRANSFORM:
+    features = transform.geojson.get_features(featureCollection)
+    for feature in features:
+        if table == "stationParameters":
+            stationParams = transformer.get_dmi_station_parameters(feature)
+
+            # LOAD TO DB
+            loader.load(host, dbname, user, table, data = stationParams)
+
+if __name__ == "__main__":
+    TEST_INFO = {
     "host"      : config.host_name,
     "dbname"  : config.new_database_name,
     "user"      : config.role_name,
-    "password"  : config.role_password.strip("'")
-}
+    "url" : etl_config.DEFAULT_URL_STATION,
+    "table" : "stationParameters",
+    }
 
-table_name = "stationParameters"
+    etl(**TEST_INFO, **etl_config.DEFAULT_STATION_PARAMETERS)
 
-
-cols = stationParams[0]
-rows = stationParams[1:]
-
-
-
-conn = loader.connect(param_dic)
-    # Run the execute_many strategy
-loader.insert_rows(conn, cols = cols, rows = rows, table = "stationParameters")
-    # Close the connection
-conn.close()

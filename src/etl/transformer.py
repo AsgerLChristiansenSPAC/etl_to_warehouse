@@ -1,4 +1,4 @@
-import etl.transform.geojson as t_geo
+import etl.transform.geojson as geojson
 
 # Data entries in MOCK_FEATURE without entries is rendered as None in python,
 # and null with dmi_prettyprint.
@@ -20,7 +20,7 @@ import etl.transform.geojson as t_geo
 # Construct a row
 
 def construct_row(**kwargs):
-    """Takes key-value pairs and returns list, in order of keyword entry.
+    """Takes key-value pairs and returns list of values, in order of keyword entry.
     Useful for turning dicts into SQL records."""
     row = [kwargs[key] for key in kwargs]
     return row
@@ -59,9 +59,11 @@ def cols_to_sql(cols:list):
 
 def get_dmi_station_parameters(feature:dict):
     """Takes a station feature from dmi and turns into list of lists."""
+    # Hardcode data source (dmi-specific function)
     data_source = "dmi"
-    station_id = t_geo.extract_property(feature, "stationId")
-    parameter_ids = t_geo.extract_property(feature, "parameterId") # This is a list
+    
+    station_id = geojson.get_property(feature, "stationId")
+    parameter_ids = geojson.get_property(feature, "parameterId") # This is a list
     station_parameters = []
     cols = ["dataSource", "stationId", "parameterId"]
     station_parameters.append(cols)
@@ -71,16 +73,5 @@ def get_dmi_station_parameters(feature:dict):
                       parameterId = parameter_id)
         station_parameters.append(row)
 
-    return station_parameters
-    
-
-
-
-
-
-# And construct an appropriate header
-
-# We need to improve our sql code. Run it through psycopg probably.
-# DB setup can be bash, it's fine. But tables should be setup in psycopg. Shouldn't be hard.
-
-# For now though:
+    return station_parameters # List of lists
+ 

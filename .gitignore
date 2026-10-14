@@ -1,2 +1,7 @@
 src/config.py
+docs/todo.md
 dev
+src/__pycache__
+src/etl/__pycache__
+src/etl/extract/__pycache__
+src/etl/transform/__pycache__

@@ -19,12 +19,3 @@ def get_query(query):
         # Handle any network-related errors or exceptions
         print('Error:', e)
         return None
-
-def extract_features(feature_colletion:dict):
-    try:
-        features = feature_colletion["features"] # List of dicts.
-        return features
-    except KeyError as e:
-        print(e)
-        print("No features found, maybe not feature-collection")
-        return None
