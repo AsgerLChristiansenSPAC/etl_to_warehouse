@@ -1,24 +1,5 @@
-if __name__ == "__main__":
-    from transform import geojson
-else:
+if __name__ != "__main___":
     from etl.transform import geojson
-
-# Data entries in MOCK_FEATURE without entries is rendered as None in python,
-# and null with dmi_prettyprint.
-
-#dmi_prettyprint(MOCK_FEATURE)
-
-
-# For a given feature (dictionary) in a list of features
-
-# Get the following attributes:
-
-# run extract_property on the following:
-
-
-#print(stationId)
-#print(parameterId)
-# Then for each entry in the parameterId array
 
 # Construct a row
 
@@ -139,6 +120,7 @@ def transform_observation(feature:dict):
 
 
 if __name__ == "__main__":
+    from transform import geojson
     featureStation = {
         "properties" :
         {

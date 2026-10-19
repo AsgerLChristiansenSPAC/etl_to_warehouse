@@ -53,9 +53,14 @@ def insert_rows(conn, cols, rows, table, verbose = True):
 
 def load(host, dbname, user, table, data:list):
     conn = connect(host, dbname, user)
-    cols = data[0]
-    rows = data[1:]
-    # INSERT INTO DB
-    insert_rows(conn, cols = cols, rows = rows, table = table)
+
+    if len(data) > 0:
+
+        cols = data[0]
+        rows = data[1:]
+    
+        # INSERT INTO DB
+        insert_rows(conn, cols = cols, rows = rows, table = table)
+    
     # Close the connection
     conn.close()

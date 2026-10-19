@@ -142,3 +142,13 @@ Because there has been a lot of learning in this project, it is admittedly very 
 - Though currently the solution is suboptimal, my program doesn't crash if it tries to reinsert the same data twice. Instead, it simply skips the row (using postgres transaction logic) if the row already exists in the database, and reports to the user how many duplicates it encountered. However, going row-by-row is expensive. I have ideas for a nearly-as-good solution though, involving batch-loading the data, and attempting to UPDATE if INSERT INTO fails.
 
 In short, lots of refactoring and cleanup still to do. But progress is being made!
+
+# 19/10/2026
+
+Prototype finished. It does what its supposed to.
+
+There are things left unsolved, but for the moment, it is fine.
+
+We can load data in. That's what matters.
+
+Now on to the next project - building an API.
