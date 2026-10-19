@@ -1,4 +1,7 @@
-import etl.transform.geojson as geojson
+if __name__ == "__main__":
+    from transform import geojson
+else:
+    from etl.transform import geojson
 
 # Data entries in MOCK_FEATURE without entries is rendered as None in python,
 # and null with dmi_prettyprint.
@@ -57,15 +60,28 @@ def cols_to_sql(cols:list):
     return cols_to_sql
 
 
-def get_dmi_station_parameters(feature:dict):
-    """Takes a station feature from dmi and turns into list of lists."""
-    # Hardcode data source (dmi-specific function)
+def transform_station_parameters(feature:dict):
+    """Transform relevant properties
+    from DMI geojson feature Station,
+    for later loading."""
+
+    # Hardcode table column names
+    cols = ["dataSource",
+            "stationId",
+            "parameterId"]
+
+    # Hardcode data-source
     data_source = "dmi"
+
+
+    # Hardcode which properties to extract.
+    station_id = geojson.get_property(
+        feature, "stationId")
     
-    station_id = geojson.get_property(feature, "stationId")
-    parameter_ids = geojson.get_property(feature, "parameterId") # This is a list
+    parameter_ids = geojson.get_property(feature, "parameterId")
+    
     station_parameters = []
-    cols = ["dataSource", "stationId", "parameterId"]
+
     station_parameters.append(cols)
     for parameter_id in parameter_ids:
         row = construct_row(dataSource = data_source,
@@ -75,3 +91,77 @@ def get_dmi_station_parameters(feature:dict):
 
     return station_parameters # List of lists
  
+
+
+def transform_station(feature:dict):
+    """Transform relevant properties
+    from DMI geojson feature Station,
+    for later loading."""
+
+    # Hardcode table column names
+    cols = ["dataSource",
+            "stationId",
+            "validTo",
+            "validFrom"]
+
+    # Hardcode data-source
+    data_source = "dmi"
+
+
+    # Hardcode which properties to extract.
+    station_id = geojson.get_property(
+        feature, "stationId")
+    valid_to = geojson.get_property(feature, "validTo")
+    valid_from = geojson.get_property(feature, "validFrom")
+
+    row = construct_row(dataSource = data_source,
+                      stationId = station_id,
+                      validTo = valid_to,
+                      validFrom = valid_from)
+    return [cols, row] # List of lists
+ 
+
+def transform_observation(feature:dict):
+
+    observation = {"dataSource" : "dmi",
+            "stationId" : geojson.get_property(
+        feature, "stationId"),
+            "parameterId" :  geojson.get_property(feature, "parameterId"),
+            "calculatedAt" : geojson.get_property(feature, "calculatedAt"),
+            "observationValue": geojson.get_property(feature, "value"),
+            "timeResolution": geojson.get_property(feature, "timeResolution")
+            
+    }
+    cols = list(observation.keys())
+
+    row = construct_row(**observation)
+    return [cols, row] # List of lists
+
+
+if __name__ == "__main__":
+    featureStation = {
+        "properties" :
+        {
+            "stationId" : 1,
+            "validFrom" : 2,
+            "validTo" : 3
+        }
+
+        
+    }
+
+    featureObs = {
+        "properties" :
+        {"stationId" : 1,
+            "parameterId" :  2,
+            "calculatedAt" : 3,
+            "value" : 4,
+            "observationValue":4,
+            "timeResolution": 5
+         }
+    }
+
+    print(transform_station(featureStation))
+    print(transform_observation(featureObs))
+
+

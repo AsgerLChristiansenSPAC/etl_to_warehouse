@@ -1,7 +1,5 @@
 export DOCKER_CLI_HINTS=false
 
-
-
 echo "Setup container"
 bash src/container/docker_setup.sh
 

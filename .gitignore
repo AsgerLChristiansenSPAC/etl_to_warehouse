@@ -5,3 +5,4 @@ src/__pycache__
 src/etl/__pycache__
 src/etl/extract/__pycache__
 src/etl/transform/__pycache__
+test/
