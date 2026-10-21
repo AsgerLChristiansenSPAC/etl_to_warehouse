@@ -152,3 +152,47 @@ There are things left unsolved, but for the moment, it is fine.
 We can load data in. That's what matters.
 
 Now on to the next project - building an API.
+
+
+# 21/10/2026
+
+So, the prototype works. in the sense that running:
+
+- *bash setup.sh*
+- *python src/etl_process.py*
+
+Causes a database to be created, with three tables (stations, stationParameters and observations)
+which is then filled with data from a *single station* over a *discrete time period*.
+
+Both have default inputs, but the user can change them.
+
+Is this ideal? No. But it is a minimum viable product.
+
+The software architecture and documentation needs a lot of work.
+
+However, we got an additional task: Make it possible to extract data from your postgres server setup
+using an API.
+
+So, today, in a single day, I've made a file in the root folder called api_demo.py.
+
+It defines a couple of endpoints, namely:
+
+/stations
+/stationParameters
+/observations
+
+If one of these endpoints are accessed while the API is running (using uvicorn),
+the code will connect to the postgres server using the superuser (not ideal, I know),
+and respond with JSON data.
+
+The code is messy and repeats itself a lot. The user doesn't have much ability to specify
+additional input variables.
+
+However. At this point, I will focus less on developing more features, and more on
+*cleaning up what I've already got*.
+
+Cleanup also includes better documentation and, if possible, some unit testing.
+
+The project is almost over, and cleanup will have to happen at some point.
+Better I do that first, and then if somehow I have time left over,
+it should be easier to develop more features with a cleaner repo.
