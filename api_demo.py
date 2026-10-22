@@ -1,6 +1,5 @@
 from src.configs import postgres_config
-
-
+import sql_utils as sql
 import psycopg
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
@@ -12,8 +11,6 @@ superuser_password = postgres_config.superuser_password
 
 
 # to run from terminal:
-
-
 # uvicorn {filename}:{app_name} --reload
 
 app = FastAPI()
@@ -36,13 +33,8 @@ def db_connect(host:str = host_name, dbname:str = new_database_name, user:str = 
     except (Exception, psycopg.DatabaseError) as error:
         print(error)
         raise HTTPException(status_code=500, detail="Database connection error")
-        #sys.exit(1)
     print("Connection successful")
     return conn
-
-
-
-
 
 class Station(BaseModel):
     dataSource: str
@@ -50,53 +42,34 @@ class Station(BaseModel):
     validFrom: str
     validTo: str | None = None
 
-@app.get("/stations/", response_model=list[Station])
-def read_stations():
-    
+
+
+def read_data(table_name, model, **params):
+    params = sql.evaluate_query_params(**params)
     conn = db_connect()
     cursor = conn.cursor()
+    cols = list(model.__pydantic_fields__.keys())
+    sql_code = sql.write_SELECT(cols,
+                            table_name = table_name, **params)
     try:
-        cursor.execute("""SELECT dataSource,
-                    stationId,
-                    validFrom,
-                    validTo
-                    FROM stations""")
+        cursor.execute(sql_code)
         stations = cursor.fetchall()
-        # Convert the results to a list of Item objects
-        station_list = [Station(dataSource=row[0], stationId=row[1], validFrom=row[2],
-                                validTo=row[3]) for row in stations]
+        station_kwargs = [{cols[i] : item for i, item in enumerate(row)}
+              for row in stations]
+        station_list = [model(**row_kwargs) for row_kwargs in station_kwargs]
         cursor.close()
         conn.close()
         return station_list
     except psycopg.Error as e:
-        print(f"Error reading stations: {e}")
-        raise HTTPException(status_code=500, detail="Failed to read stations")
+        print(f"Error reading {table_name}: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to read {table_name}")
 
 
-@app.get("/stations/{station_id}", response_model=Station)
-def read_station(station_id):
-    conn = db_connect()
-    cursor = conn.cursor()
-    try:
-        cursor.execute("""SELECT dataSource,
-                    stationId,
-                    validFrom,
-                    validTo
-                    FROM stations
-                    WHERE stationId = %s""", (station_id,))
-        item = cursor.fetchall()
-        if item:
-            item_obj = Station(dataSource=item[0], stationId=item[1], 
-                               validFrom=item[2],
-                                validTo=item[3])
-            cursor.close()
-            conn.close()
-            return item_obj
-        else:
-            raise HTTPException(status_code=404, detail="Station not found")
-    except psycopg.Error as e:
-        print(f"Error reading station: {e}")
-        raise HTTPException(status_code=500, detail="Failed to read station")
+@app.get("/stations", response_model=list[Station])
+def read_stations(stationId:str|None = None):
+    station_list = read_data(table_name="stations", model = Station, stationId = stationId)
+    return station_list
+
 
 
 class StationParameter(BaseModel):
@@ -104,51 +77,11 @@ class StationParameter(BaseModel):
     stationId: str
     parameterId: str
 
-@app.get("/stationParameters/", response_model=list[StationParameter])
-def read_all_station_parameters():
-    
-    conn = db_connect()
-    cursor = conn.cursor()
-    try:
-        cursor.execute("""SELECT dataSource,
-                    stationId,
-                    parameterId
-                    FROM stationParameters""")
-        stationParameters = cursor.fetchall()
-        stationParameter_list = [StationParameter(dataSource=row[0], stationId=row[1], parameterId=row[2]
-                                                  ) for row in stationParameters]
-        cursor.close()
-        conn.close()
-        return stationParameter_list
-    except psycopg.Error as e:
-        print(f"Error reading stationParameters: {e}")
-        raise HTTPException(status_code=500, detail="Failed to read stationParameters")
 
-
-
-@app.get("/stationParameters/{station_id}", response_model=list[StationParameter])
-def read_station_parameters(station_id):
-    
-    conn = db_connect()
-    cursor = conn.cursor()
-    try:
-        cursor.execute("""SELECT dataSource,
-                    stationId,
-                    parameterId
-                    FROM stationParameters
-                    WHERE  stationId = %s""", (station_id,))
-        stationParameters = cursor.fetchall()
-        # Convert the results to a list of Item objects
-        stationParameter_list = [StationParameter(dataSource=row[0], stationId=row[1], parameterId=row[2]
-                                                  ) for row in stationParameters]
-        cursor.close()
-        conn.close()
-        return stationParameter_list
-    except psycopg.Error as e:
-        print(f"Error reading stationParameters: {e}")
-        raise HTTPException(status_code=500, detail="Failed to read stationParameters")
-
-
+@app.get("/stationParameters", response_model=list[StationParameter])
+def read_station_parameters():
+    station_list = read_data(table_name="stationParameters", model = StationParameter)
+    return station_list
 
 
 class Observation(BaseModel):
@@ -159,29 +92,10 @@ class Observation(BaseModel):
     observationValue: float
     timeResolution: str
 
-@app.get("/observations/", response_model=list[Observation])
-def read_observations():
-
-    conn = db_connect()
-    cursor = conn.cursor()
-    try:
-        cursor.execute("""SELECT dataSource,
-                            stationId,
-                            parameterId,
-                            calculatedAt,
-                            observationValue,
-                            timeResolution
-                            FROM observations""")
-        observations = cursor.fetchall()
-        # Convert the results to a list of Item objects
-        observation_list = [Observation(dataSource=row[0], stationId=row[1], parameterId=row[2],
-                                        calculatedAt=row[3],
-                                        observationValue=row[4],
-                                        timeResolution=row[5]) for row in observations]
-        cursor.close()
-        conn.close()
-        return observation_list
-    except psycopg.Error as e:
-        print(f"Error reading observations: {e}")
-        raise HTTPException(status_code=500, detail="Failed to read observations")
-
+@app.get("/observations", response_model=list[Observation])
+def read_observations(stationId:str|None = None, parameterId:str|None = None):
+    station_list = read_data(table_name="observations",
+                             model = Observation,
+                             stationId = stationId,
+                             parameterId = parameterId)
+    return station_list
