@@ -1,5 +1,5 @@
 from src.configs import postgres_config
-import sql_utils as sql
+from src.utils import sql
 import psycopg
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel

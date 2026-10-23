@@ -1,5 +1,5 @@
 if __name__ != "__main___":
-    from api_utils import geojson
+    from utils import geojson
 
 # Construct a row
 
@@ -120,7 +120,7 @@ def transform_observation(feature:dict):
 
 
 if __name__ == "__main__":
-    from api_utils import geojson
+    from utils import geojson
     featureStation = {
         "properties" :
         {

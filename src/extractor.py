@@ -1,4 +1,4 @@
-import api_utils.dmi_api as dmi_api
+import utils.dmi_api as dmi_api
 import requests
 # Modified from: https://www.geeksforgeeks.org/python/how-to-make-api-calls-using-python/
 
