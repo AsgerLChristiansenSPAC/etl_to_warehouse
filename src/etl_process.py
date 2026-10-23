@@ -6,7 +6,7 @@ from configs import postgres_config
 import etl.extractor as extractor
 import etl.loader as loader
 import etl.transformer as transformer
-from etl.transform import geojson
+from etl.api_utils import geojson
 
 # Defining extractor functions:
 
