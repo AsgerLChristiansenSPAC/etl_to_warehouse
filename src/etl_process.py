@@ -3,10 +3,10 @@ import sys
 
 from configs import etl_config
 from configs import postgres_config
-import etl.extractor as extractor
-import etl.loader as loader
-import etl.transformer as transformer
-from etl.api_utils import geojson
+import extractor as extractor
+import loader as loader
+import transformer as transformer
+from api_utils import geojson
 
 # Defining extractor functions:
 
