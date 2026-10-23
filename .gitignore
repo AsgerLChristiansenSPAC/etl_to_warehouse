@@ -1,8 +1,5 @@
-src/config.py
+__pycache__/
 docs/todo.md
 dev
-src/__pycache__
-src/etl/__pycache__
-src/etl/extract/__pycache__
-src/etl/transform/__pycache__
+src/configs/postgres_config.py
 test/
