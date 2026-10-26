@@ -1,46 +1,72 @@
+# Quick-fix of import issues when importing this module.
+# Not ideal, but it works.
 if __name__ != "__main___":
     from utils import geojson
 
-def kwargs_to_values_list(**kwargs):
+
+
+def list_kwargs_values(**kwargs):
     """Takes key-value pairs and returns list of values, in order of keyword entry.
     Useful for turning dicts into SQL records."""
     row = [kwargs[key] for key in kwargs]
     return row
 
 
-def feature_to_table_schema(feature:dict, mapper:dict, data_source = "dmi"):
-    """Takes a geojson dictionary and
-    a mapper (dictionary of table column names and 
+def db_row_from_feature(feature:dict, mapper:dict, data_source = "dmi"):
+    """Takes a geojson feature object, and
+    a mapper (dictionary of postgres table column names and 
     the associated geojson properties), and turns
-    into "pseudo table" schema"""
-
-    table_schema = {}
-    table_schema.update({"dataSource" : data_source})
+    into a "row-like" dictionary, whose keys match
+    the column names of the database, rather
+    than the names used in the geojson object.
+    This function, with an appropriate mapper dict,
+    should allow the transformation of data from
+    multiple sources (with different naming schemes)
+    into the same database.
+    """
+    db_row = {}
+    db_row.update({"dataSource" : data_source})
     property_mapping = {key : geojson.get_property(feature, val) for key, val in mapper.items()}
-    table_schema.update(property_mapping)
-    return table_schema
+    db_row.update(property_mapping)
+    return db_row
 
-def schema_to_pseudo_table(table_schema:dict):
-    cols = list(table_schema.keys())
-    row = kwargs_to_values_list(**table_schema)
+def db_row_to_pseudo_table(db_row:dict):
+    """Turns a db_row into a "pseudo-table", a list of lists
+    where the first list contains column names,
+    and the second list contains row entries.
+    This structure is used for later
+    execution of SQL INSERT using 
+    psycopg."""
+    cols = list(db_row.keys())
+    row = list_kwargs_values(**db_row)
     return [cols, row] # List of lists
 
-def transform_feature(feature:dict, mapper:dict, data_source = "dmi"):
+
+def transform_feature(feature:dict, mapper:dict, data_source = "dmi", array_properties:list = None):
     """Takes a geojson dictionary and
     a mapper (dictionary of table column names and 
     the associated geojson properties), and turns
     into "pseudo dataframe" (list of lists).
     First list is column names (AKA a header),
     subsequent lists are row entries."""
-    table_schema = feature_to_table_schema(feature, mapper, data_source=data_source)
-    pseudo_table = schema_to_pseudo_table(table_schema)
+    table_schema = db_row_from_feature(feature, mapper, data_source=data_source)
+    pseudo_table = db_row_to_pseudo_table(table_schema)
     return pseudo_table
     
 
 def transform_station_parameters(feature:dict):
     """Transform relevant properties
     from DMI geojson feature Station,
-    for later loading."""
+    for later loading.
+    This function could ideally be
+    more flexible (using some of the unused
+    functions in the geojson module).
+    The reason it isn't is that the
+    parameterId property from the dmi API
+    has a many-to-one relationship between
+    stations and observations, but is otherwise
+    identical to any other geojson property. This is
+    difficult to handle dynamically."""
 
     # Hardcode table column names
     cols = ["dataSource",
@@ -54,14 +80,14 @@ def transform_station_parameters(feature:dict):
     # Hardcode which properties to extract.
     station_id = geojson.get_property(
         feature, "stationId")
-    
     parameter_ids = geojson.get_property(feature, "parameterId")
-    
+
+    # Construct pseudo-table:
     station_parameters = []
 
     station_parameters.append(cols)
     for parameter_id in parameter_ids:
-        row = kwargs_to_values_list(dataSource = data_source,
+        row = list_kwargs_values(dataSource = data_source,
                       stationId = station_id,
                       parameterId = parameter_id)
         station_parameters.append(row)
