@@ -57,16 +57,12 @@ def transform_feature(feature:dict, mapper:dict, data_source = "dmi", array_prop
 def transform_station_parameters(feature:dict):
     """Transform relevant properties
     from DMI geojson feature Station,
-    for later loading.
+    for later loading into table stationParameters.
+
     This function could ideally be
-    more flexible (using some of the unused
-    functions in the geojson module).
-    The reason it isn't is that the
-    parameterId property from the dmi API
-    has a many-to-one relationship between
-    stations and observations, but is otherwise
-    identical to any other geojson property. This is
-    difficult to handle dynamically."""
+    more flexible (akin to transform_feature()),
+    possibly using some of the unused
+    functions in the geojson module."""
 
     # Hardcode table column names
     cols = ["dataSource",
