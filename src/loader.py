@@ -1,7 +1,9 @@
 import psycopg
 import sys
 def connect(host:str, dbname:str, user:str):
-    """ Connect to the PostgreSQL database server """
+    """ Connect to the PostgreSQL database server.
+    Requires hostname, databasename and username,
+    and queries the user for password."""
     print(f"Please enter password for user {user}")
     password = input()
 
@@ -21,8 +23,10 @@ def connect(host:str, dbname:str, user:str):
     return conn
 
 
-def insert_rows(conn, cols, rows, table, verbose = True):
-    # Create a list of tupples from the dataframe values
+def insert_rows(conn, cols:list, rows:list, table, verbose = True):
+    """Executes an INSERT INTO using a psycopg connection
+    of input (list of columns, list of rows) into specified table."""
+
     # Comma-separated dataframe columns
     col_str = ','.join(list(cols))
     # SQL quert to execute
