@@ -70,50 +70,6 @@ def transform_station_parameters(feature:dict):
  
 
 
-def transform_station(feature:dict):
-    """Transform relevant properties
-    from DMI geojson feature Station,
-    for later loading."""
-
-    # Hardcode table column names
-    cols = ["dataSource",
-            "stationId",
-            "validTo",
-            "validFrom"]
-
-    # Hardcode data-source
-    data_source = "dmi"
-
-
-    # Hardcode which properties to extract.
-    station_id = geojson.get_property(
-        feature, "stationId")
-    valid_to = geojson.get_property(feature, "validTo")
-    valid_from = geojson.get_property(feature, "validFrom")
-
-    row = kwargs_to_values_list(dataSource = data_source,
-                      stationId = station_id,
-                      validTo = valid_to,
-                      validFrom = valid_from)
-    return [cols, row] # List of lists
- 
-
-def transform_observation(feature:dict):
-
-    observation = {"dataSource" : "dmi",
-            "stationId" : geojson.get_property(
-        feature, "stationId"),
-            "parameterId" :  geojson.get_property(feature, "parameterId"),
-            "calculatedAt" : geojson.get_property(feature, "calculatedAt"),
-            "observationValue": geojson.get_property(feature, "value"),
-            "timeResolution": geojson.get_property(feature, "timeResolution")
-            
-    }
-    cols = list(observation.keys())
-
-    row = kwargs_to_values_list(**observation)
-    return [cols, row] # List of lists
-
 
 if __name__ == "__main__":
     from utils import geojson
