@@ -1,5 +1,7 @@
 import copy
 
+# Functions currently in use in the code.
+
 def get_property(feature:dict, property:str):
     """A geojson 'feature' object has a 'properties' member, which itself
     contains json key-value pairs - a property name, and a value.
@@ -8,12 +10,15 @@ def get_property(feature:dict, property:str):
     
     return feature["properties"][property]
 
-def get_property_dict(feature:dict, property:str):
-    return {property : get_property(feature, property)}
-
 
 
 def get_features(feature_collection:dict):
+    """A featureCollection geojson object is a dictionary containing
+    feature objects, plus some additional information about the query
+    which produced the featureColleciton.
+    The feature objects themselves are the most
+    important member of a featureCollection.
+    This function extracts them."""
     try:
         features = feature_collection["features"] # List of dicts.
         return features
@@ -22,6 +27,26 @@ def get_features(feature_collection:dict):
         print("No features found, maybe not feature-collection")
         return None
 
+
+# Functions intended for handling geojson properties whose values are JSON arrays,
+# rather than floats, strings, etc.
+# An example from the DMI API climate data is the parameterId variable,
+# which maps the relation between a weather station and the many
+# different types of parameters it estimates.
+# As such, a geojson feature of type "station" has many
+# parameterId's, whereas a feature of type "observation"
+# only has one.
+# The functions below were intended to make it possible
+# to dynamically handle geojson properties which are arrays.
+
+# Status: Unfinished. Which is to say, the functions work, but their exact
+# implementation (such as when the relevant properties are extracted from
+# the geojson features) are currently at odds with transformer.py
+
+
+
+def get_property_dict(feature:dict, property:str):
+    return {property : get_property(feature, property)}
 
 def get_many_properties(feature:dict, properties:list):
     """This function extracts particularly relevant properties,
@@ -36,19 +61,11 @@ def get_many_properties(feature:dict, properties:list):
         property_dict.update(new_property_dict)
     return property_dict
 
-### Handling geojson properties whose values are JSON arrays.
-
-### For the purposes of these scripts, these are called "category properties"
-
-#    Since category properties have a many-to-one relationship,
-#    multiple independent SQL rows are necessary to enter them in a database.
-#    This function returns all combinations of a list of properties
-#    (key-value pairs) with a category_property (key-array[values]).
-#    So, for example, if category property has three values, it returns
-#    a list of three dicts, containing all members of 'properties',
-#    and each containing a single key-value pair from category_property.
 
 def append_category_value(property_dict, category_property, category_value):
+    """Appends a category value to an existing dict without one -
+    i.e. appending a new column and corresponding value
+    to an existing row."""
     category_dict = {category_property : category_value}
     # Create a DEEP COPY of properties dictionary.
     combination = copy.deepcopy(property_dict)
@@ -155,4 +172,4 @@ if __name__ == "__main__":
         except AssertionError:
             print("Error!")
             print(f'Should be {test["length"]}, is actually {len(combi)}')
-    print(combi)
+#    print(combi)
