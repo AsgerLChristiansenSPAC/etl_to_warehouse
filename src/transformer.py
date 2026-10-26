@@ -25,7 +25,7 @@ def schema_to_pseudo_table(table_schema:dict):
     row = kwargs_to_values_list(**table_schema)
     return [cols, row] # List of lists
 
-def feature_to_pseudo_table(feature:dict, mapper:dict, data_source = "dmi"):
+def transform_feature(feature:dict, mapper:dict, data_source = "dmi"):
     """Takes a geojson dictionary and
     a mapper (dictionary of table column names and 
     the associated geojson properties), and turns
@@ -145,5 +145,5 @@ if __name__ == "__main__":
     from configs.etl_config import TABLE_MAPPERS
 
 
-    print(feature_to_pseudo_table(featureObs, TABLE_MAPPERS["observations"]))
-    print(feature_to_pseudo_table(featureStation, TABLE_MAPPERS["stations"]))
+    print(transform_feature(featureObs, TABLE_MAPPERS["observations"]))
+    print(transform_feature(featureStation, TABLE_MAPPERS["stations"]))
