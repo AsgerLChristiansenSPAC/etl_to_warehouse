@@ -5,20 +5,6 @@ import loader as loader
 import transformer as transformer
 from utils import geojson
 
-def etl_stations(host, dbname, user, url, **kwargs):
-    """Maps station data to tables Stations and StationParameters."""
-
-    # EXTRACT:
-    featureCollection =extractor.extract_dmi_collection(url = url,  **kwargs) # datetime and stationId go here.
-    
-    features = geojson.get_features(featureCollection)
-
-    for feature in features: # For each station feature:
-        stationParams = transformer.transform_station_parameters(feature)
-        loader.load(host, dbname, user, table = "stationParameters", data = stationParams)
-        station = transformer.transform_station(feature)
-        loader.load(host, dbname, user, table = "stations", data = station)
-
 
 def prompt_inputs(datetime = None, station_id = None):
     if station_id == None:
@@ -45,7 +31,23 @@ def prompt_inputs(datetime = None, station_id = None):
             datetime = datetime_input
     return (datetime, stationId)
 
-def etl_observations(host, dbname, user, url, **kwargs):
+def etl_stations(host, dbname, user, url, **kwargs):
+    """Maps station data to tables Stations and StationParameters."""
+
+    # EXTRACT:
+    featureCollection =extractor.extract_dmi_collection(url = url,  **kwargs) # datetime and stationId go here.
+    
+    features = geojson.get_features(featureCollection)
+
+    for feature in features: # For each station feature:
+        stationParams = transformer.transform_station_parameters(feature)
+        loader.load(host, dbname, user, table = "stationParameters", data = stationParams)
+        station = transformer.transform_feature(feature, etl_config.TABLE_MAPPERS["stations"])
+        loader.load(host, dbname, user, table = "stations", data = station)
+
+
+
+def etl_observations(host, dbname, user, url, table_name = "observations", **kwargs):
     """Maps station data to table Observations."""
 
     # EXTRACT:
@@ -56,12 +58,13 @@ def etl_observations(host, dbname, user, url, **kwargs):
     observations = []
     cols = None
     for feature in features: # For each station feature:
-        observation = transformer.transform_observation(feature)
+        #observation = transformer.transform_observation(feature)
+        observation = transformer.transform_feature(feature, etl_config.TABLE_MAPPERS[table_name])
         if cols == None:
             cols = observation[0]
             observations.append(cols)
         observations.append(observation[1])
-    loader.load(host, dbname, user, table = "observations", data = observations)
+    loader.load(host, dbname, user, table_name, data = observations)
 
     
 def etl(host = postgres_config.host_name,
