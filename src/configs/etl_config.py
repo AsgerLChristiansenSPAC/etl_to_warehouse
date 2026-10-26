@@ -16,3 +16,24 @@ DEFAULT_STATION = {
     "stationId" : '06070'
     #"limit" : 5
 }
+
+
+TABLE_MAPPERS = {
+    # top level keys are postgres table names.
+    # Second level keys are postgres table column names,
+    # and corresponding DMI database names.
+    "stations" : {"stationId" : "stationId",
+                  "validFrom" : "validFrom",
+                  "validTo" : "validTo"},
+    
+    "stationParameters" : {            
+   "stationId" : "stationId",
+    "parameterId" : "parameterId"},
+
+    "observations" : {            
+   "stationId" : "stationId",
+    "parameterId" : "parameterId",
+    "calculatedAt" : "calculatedAt",
+    "observationValue" : "value",
+    "timeResolution" : "timeResolution"}
+}

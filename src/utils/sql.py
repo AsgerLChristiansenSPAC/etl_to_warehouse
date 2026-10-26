@@ -1,13 +1,23 @@
-def cols_to_sql(cols):
-    col_string = ','.join(list(cols))
-    return "(" + col_string + ")"
+def value_to_sql(value):
+    """Adds single quotations around str-type 
+    values, necessary for insertion in SQL."""
+    if type(value) == str:
+        return "'"+str(value)+"'"
+    else:
+        return value
+
+def row_to_sql(row:list):
+    """Takes list and turns into sql VALUES for INSERT INTO or similar."""
+    begin = "("
+    middle = ','.join([value_to_sql(item) for item in row])
+    end =  ")"
+    values = begin+middle+end
+    return values
 
 
-
-def row_to_VALUES(row):
-    row_string = ','.join(["'"+str(item)+"'" for item in row])
-
-    return "(" + row_string +")"
+def cols_to_sql(cols:list):
+    """Takes list of cols and turns into column string for SQL"""
+    return ','.join(cols)
 
 
 def write_sql_VALUES(rows):
@@ -16,7 +26,7 @@ def write_sql_VALUES(rows):
     for row in rows:
         if not first_row:
             values_str = values_str + ","
-        row_string = row_to_VALUES(row)
+        row_string = row_to_sql(row)
         values_str = values_str + row_string
         if first_row:
             first_row = False
@@ -37,8 +47,7 @@ def write_WHERE(operator = "=", **params):
     param_str = ''
     first_param = True
     for key, val in params.items():
-        if type(val) == str:
-            val = f"'{val}'"
+        val = value_to_sql(val)
         if not first_param:
             param_str = param_str + ","
         else:
@@ -47,7 +56,7 @@ def write_WHERE(operator = "=", **params):
     return f"WHERE {param_str}"
 
 def write_SELECT(cols:list, table_name, **params):
-    col_str = ','.join(cols)
+    col_str = cols_to_sql(cols)
     sql = f"SELECT {col_str} FROM {table_name}"
     if params:
         param_str = write_WHERE(**params)

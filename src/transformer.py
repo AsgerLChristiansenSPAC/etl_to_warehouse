@@ -1,45 +1,41 @@
 if __name__ != "__main___":
     from utils import geojson
 
-# Construct a row
-
-def construct_row(**kwargs):
+def kwargs_to_values_list(**kwargs):
     """Takes key-value pairs and returns list of values, in order of keyword entry.
     Useful for turning dicts into SQL records."""
     row = [kwargs[key] for key in kwargs]
     return row
 
 
-def str_to_sql(value:str): # String entries
-    return "'"+str(value)+"'"
+def feature_to_table_schema(feature:dict, mapper:dict, data_source = "dmi"):
+    """Takes a geojson dictionary and
+    a mapper (dictionary of table column names and 
+    the associated geojson properties), and turns
+    into "pseudo table" schema"""
 
-def float_to_sql(value:float):
-    return str(value)
+    table_schema = {}
+    table_schema.update({"dataSource" : data_source})
+    property_mapping = {key : geojson.get_property(feature, val) for key, val in mapper.items()}
+    table_schema.update(property_mapping)
+    return table_schema
 
-def value_to_sql(value):
-    if type(value) == str:
-        return str_to_sql(value)
-    else:
-        return float_to_sql(value)
+def schema_to_pseudo_table(table_schema:dict):
+    cols = list(table_schema.keys())
+    row = kwargs_to_values_list(**table_schema)
+    return [cols, row] # List of lists
 
-
-def row_to_sql(row:list):
-    """Takes list and turns into sql VALUES for INSERT INTO or similar."""
-    begin = "("
-    middle = ','.join([value_to_sql(item) for item in row])
-    end =  ")"
-    values = begin+middle+end
-    return values
-
-
-
-def cols_to_sql(cols:list):
-    """Takes list of cols and turns into column string for SQL"""
-    begin = "("
-    middle = ','.join(cols) # All cols should be string!
-    end =  ")"
-    return cols_to_sql
-
+def feature_to_pseudo_table(feature:dict, mapper:dict, data_source = "dmi"):
+    """Takes a geojson dictionary and
+    a mapper (dictionary of table column names and 
+    the associated geojson properties), and turns
+    into "pseudo dataframe" (list of lists).
+    First list is column names (AKA a header),
+    subsequent lists are row entries."""
+    table_schema = feature_to_table_schema(feature, mapper, data_source=data_source)
+    pseudo_table = schema_to_pseudo_table(table_schema)
+    return pseudo_table
+    
 
 def transform_station_parameters(feature:dict):
     """Transform relevant properties
@@ -65,7 +61,7 @@ def transform_station_parameters(feature:dict):
 
     station_parameters.append(cols)
     for parameter_id in parameter_ids:
-        row = construct_row(dataSource = data_source,
+        row = kwargs_to_values_list(dataSource = data_source,
                       stationId = station_id,
                       parameterId = parameter_id)
         station_parameters.append(row)
@@ -95,7 +91,7 @@ def transform_station(feature:dict):
     valid_to = geojson.get_property(feature, "validTo")
     valid_from = geojson.get_property(feature, "validFrom")
 
-    row = construct_row(dataSource = data_source,
+    row = kwargs_to_values_list(dataSource = data_source,
                       stationId = station_id,
                       validTo = valid_to,
                       validFrom = valid_from)
@@ -115,7 +111,7 @@ def transform_observation(feature:dict):
     }
     cols = list(observation.keys())
 
-    row = construct_row(**observation)
+    row = kwargs_to_values_list(**observation)
     return [cols, row] # List of lists
 
 
@@ -143,7 +139,11 @@ if __name__ == "__main__":
          }
     }
 
-    print(transform_station(featureStation))
-    print(transform_observation(featureObs))
+#    print(transform_station(featureStation))
+#    print(transform_observation(featureObs))
+
+    from configs.etl_config import TABLE_MAPPERS
 
 
+    print(feature_to_pseudo_table(featureObs, TABLE_MAPPERS["observations"]))
+    print(feature_to_pseudo_table(featureStation, TABLE_MAPPERS["stations"]))
