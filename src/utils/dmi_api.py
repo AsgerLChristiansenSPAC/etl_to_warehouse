@@ -1,19 +1,15 @@
 # Transform functions specific to DMI's climate API.
 import datetime
-import json
 
-def dmi_prettyprint(data:dict):
-    data = json.dumps(data, indent=4)
-    print(data)
-    
+
+
+
 def datetime_dmi(date_time):
     format = '%Y-%m-%dT%H:%M:%SZ'
     datetime_str = datetime.datetime.strptime(date_time, format)
 
     return datetime_str
 
-
-## If useful to specify parameters as dict, use these functions:
 
 def index_parameter_keys(parameters:dict):
     keys = list(parameters.keys())
