@@ -1,3 +1,4 @@
+import utils.dmi_api as dmi_api
 import requests
 # Modified from: https://www.geeksforgeeks.org/python/how-to-make-api-calls-using-python/
 
@@ -19,12 +20,9 @@ def get_query(query):
         # Handle any network-related errors or exceptions
         print('Error:', e)
         return None
+# Defining extract_dmi() as dmi-specific version of geo.get_query()
 
-def extract_features(feature_colletion:dict):
-    try:
-        features = feature_colletion["features"] # List of dicts.
-        return features
-    except KeyError as e:
-        print(e)
-        print("No features found, maybe not feature-collection")
-        return None
+extract_dmi_collection = dmi_api.dmi_query(get_query)
+
+# Make the function able to loop through pages.
+extract_dmi_pages = dmi_api.loop_through_pages(extract_dmi_collection)

@@ -1,2 +1,4 @@
-src/config.py
+__pycache__/
 dev
+src/configs/postgres_config.py
+test/

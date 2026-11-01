@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Create database
-source src/config.py
+source src/configs/postgres_config.py
 # Create new database
 
 docker exec -it "$container_name" psql -h "$host_name" -d "$database_name" -U "$role_name" -p "$port_name" -c "create database $new_database_name"

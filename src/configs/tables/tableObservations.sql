@@ -4,6 +4,6 @@ CREATE TABLE observations (
     parameterId varchar(255) NOT NULL,
     calculatedAt varchar(255) NOT NULL,
     observationValue FLOAT,
-    observationUnit varchar(255),
+    timeResolution varchar(255),
     PRIMARY KEY (dataSource, stationId, parameterId, calculatedAt)
 );
