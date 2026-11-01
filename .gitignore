@@ -1,5 +1,4 @@
 __pycache__/
-docs/todo.md
 dev
 src/configs/postgres_config.py
 test/
