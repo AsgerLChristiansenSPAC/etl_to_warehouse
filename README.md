@@ -80,9 +80,9 @@ The program assumes Docker Desktop is installed locally and running, allowing fo
 Additionally, the program requires a postgreSQL image for docker, to allow the creation of a postgres database in a container.
 The image version used in this program is 18.6, at the time of writing (01/11/2026) tagged as "latest": https://hub.docker.com/_/postgres/
 
-## Python package dependencies
+### Python package dependencies
 
-### Quick dependency installation
+#### Quick dependency installation
 
 The following command:
 
@@ -92,9 +92,9 @@ bash install_packages.sh
 
 installs the necessary dependencies **without** specifying package version (as most likely, later versions of these packages will still work).
 
-For manual installation, see "Dependencies" below.
+For manual installation, see "Dependency Details" below.
 
-### Dependencies
+#### Dependency Details
 
 The following packages are required. The version specified is the one used at the time of development. Other versions may also work.
 
